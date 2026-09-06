@@ -1,0 +1,318 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Request Mechanic - Garage Dost</title>
+
+    <link rel="stylesheet"
+          href="garage-dost.css">
+
+</head>
+
+<body>
+
+<header>
+
+    <div class="logo">
+        🚗 Garage Dost
+    </div>
+
+    <a href="index.html"
+       class="btn">
+        Home
+    </a>
+
+</header>
+
+
+<main class="form-page">
+
+    <div class="form-card">
+
+        <h1>🚨 Request Mechanic</h1>
+
+        <p class="subtitle">
+            Your Garage Dost will come to your location.
+        </p>
+
+
+        <form id="requestForm">
+
+            <label>Customer Name</label>
+
+            <input
+                type="text"
+                id="customerName"
+                placeholder="Enter your name"
+                required
+            >
+
+
+            <label>Mobile Number</label>
+
+            <input
+                type="tel"
+                id="customerMobile"
+                placeholder="Enter mobile number"
+                required
+            >
+
+
+            <label>Vehicle Type</label>
+
+            <select id="vehicleType" required>
+
+                <option value="">
+                    Select Vehicle
+                </option>
+
+                <option>🏍️ Bike</option>
+
+                <option>🚗 Car</option>
+
+                <option>🛺 Auto</option>
+
+                <option>🚙 Other</option>
+
+            </select>
+
+
+            <label>Vehicle Number</label>
+
+            <input
+                type="text"
+                id="vehicleNumber"
+                placeholder="Example: AP21AB1234"
+                required
+            >
+
+
+            <label>Vehicle Problem</label>
+
+            <select id="problem" required>
+
+                <option value="">
+                    Select Problem
+                </option>
+
+                <option>🛞 Tyre Puncture</option>
+
+                <option>🔋 Battery Problem</option>
+
+                <option>⛽ Fuel Problem</option>
+
+                <option>🔧 Engine Problem</option>
+
+                <option>🚗 Vehicle Not Starting</option>
+
+                <option>🚛 Towing Required</option>
+
+                <option>🛠️ Other</option>
+
+            </select>
+
+
+            <label>Current Location 📍</label>
+
+            <button
+                type="button"
+                class="secondary-button"
+                onclick="getCustomerLocation()">
+
+                📍 Get My Current Location
+
+            </button>
+
+
+            <div class="location-box">
+
+                <p id="locationStatus">
+                    Location not selected
+                </p>
+
+                <p id="coordinates"></p>
+
+            </div>
+
+
+            <input
+                type="hidden"
+                id="latitude">
+
+            <input
+                type="hidden"
+                id="longitude">
+
+
+            <button
+                type="submit"
+                class="form-button">
+
+                🚨 Find & Request Nearby Mechanic
+
+            </button>
+
+        </form>
+
+    </div>
+
+</main>
+
+
+<script>
+
+function getCustomerLocation() {
+
+    const status =
+        document.getElementById(
+            "locationStatus"
+        );
+
+    if (!navigator.geolocation) {
+
+        status.innerText =
+            "❌ Location not supported.";
+
+        return;
+    }
+
+
+    status.innerText =
+        "📍 Getting your location...";
+
+
+    navigator.geolocation.getCurrentPosition(
+
+        function(position) {
+
+            const lat =
+                position.coords.latitude;
+
+            const lon =
+                position.coords.longitude;
+
+
+            document.getElementById(
+                "latitude"
+            ).value = lat;
+
+
+            document.getElementById(
+                "longitude"
+            ).value = lon;
+
+
+            status.innerText =
+                "✅ Location captured!";
+
+
+            document.getElementById(
+                "coordinates"
+            ).innerText =
+                "📍 Location: " +
+                lat.toFixed(5) +
+                ", " +
+                lon.toFixed(5);
+
+        },
+
+
+        function() {
+
+            status.innerText =
+                "❌ Please allow location access.";
+
+        }
+
+    );
+
+}
+
+
+document
+.getElementById("requestForm")
+.addEventListener("submit", function(event) {
+
+    event.preventDefault();
+
+
+    const lat =
+        document.getElementById(
+            "latitude"
+        ).value;
+
+    const lon =
+        document.getElementById(
+            "longitude"
+        ).value;
+
+
+    if (!lat || !lon) {
+
+        alert(
+            "Please get your current location first."
+        );
+
+        return;
+    }
+
+
+    const request = {
+
+        customer:
+            document.getElementById(
+                "customerName"
+            ).value,
+
+        mobile:
+            document.getElementById(
+                "customerMobile"
+            ).value,
+
+        vehicle:
+            document.getElementById(
+                "vehicleType"
+            ).value,
+
+        vehicleNumber:
+            document.getElementById(
+                "vehicleNumber"
+            ).value,
+
+        problem:
+            document.getElementById(
+                "problem"
+            ).value,
+
+        latitude: lat,
+
+        longitude: lon,
+
+        status: "Searching"
+
+    };
+
+
+    localStorage.setItem(
+        "garageRequest",
+        JSON.stringify(request)
+    );
+
+
+    window.location.href =
+        "tracking.html";
+
+});
+
+</script>
+
+</body>
+</html>
+```
