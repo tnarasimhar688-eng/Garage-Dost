@@ -1,0 +1,96 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Mechanic Login - Garage Dost</title>
+
+    <link rel="stylesheet"
+          href="garage-dost.css">
+
+</head>
+
+<body>
+
+<header>
+
+    <div class="logo">
+        🚗 Garage Dost
+    </div>
+
+    <a href="index.html"
+       class="btn">
+        Home
+    </a>
+
+</header>
+
+
+<main class="form-page">
+
+    <div class="form-card">
+
+        <h1>👨‍🔧 Mechanic Login</h1>
+
+        <p class="subtitle">
+            Login to receive nearby service requests.
+        </p>
+
+
+        <form onsubmit="mechanicLogin(event)">
+
+            <label>Mobile Number</label>
+
+            <input
+                type="tel"
+                placeholder="Mechanic mobile number"
+                required
+            >
+
+
+            <label>Password</label>
+
+            <input
+                type="password"
+                placeholder="Password"
+                required
+            >
+
+
+            <button class="form-button">
+                Mechanic Login
+            </button>
+
+        </form>
+
+    </div>
+
+</main>
+
+
+<script>
+
+function mechanicLogin(event) {
+
+    event.preventDefault();
+
+    localStorage.setItem(
+        "mechanicLoggedIn",
+        "true"
+    );
+
+    window.location.href =
+        "mechanic.html";
+}
+
+</script>
+
+</body>
+</html>
+```
