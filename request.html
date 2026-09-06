@@ -168,148 +168,118 @@
 
 <script>
 
-function getCustomerLocation() {
-
-    const status =
-        document.getElementById(
-            "locationStatus"
-        );
+function getLocation() {
 
     if (!navigator.geolocation) {
-
-        status.innerText =
-            "❌ Location not supported.";
-
+        alert("Geolocation is not supported by your browser.");
         return;
     }
 
-
-    status.innerText =
-        "📍 Getting your location...";
-
+    document.getElementById("locationStatus").innerText =
+        "Getting your location... 📍";
 
     navigator.geolocation.getCurrentPosition(
 
         function(position) {
 
-            const lat =
-                position.coords.latitude;
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
 
-            const lon =
-                position.coords.longitude;
+            document.getElementById("latitude").value = lat;
+            document.getElementById("longitude").value = lon;
 
+            document.getElementById("locationStatus").innerText =
+                "Location captured successfully ✅";
 
-            document.getElementById(
-                "latitude"
-            ).value = lat;
-
-
-            document.getElementById(
-                "longitude"
-            ).value = lon;
-
-
-            status.innerText =
-                "✅ Location captured!";
-
-
-            document.getElementById(
-                "coordinates"
-            ).innerText =
-                "📍 Location: " +
-                lat.toFixed(5) +
-                ", " +
-                lon.toFixed(5);
-
+            console.log("Latitude:", lat);
+            console.log("Longitude:", lon);
         },
 
-
-        function() {
-
-            status.innerText =
-                "❌ Please allow location access.";
-
+        function(error) {
+            alert("Unable to get location. Please allow location permission.");
+            console.log(error);
         }
-
     );
-
 }
 
 
-document
-.getElementById("requestForm")
-.addEventListener("submit", function(event) {
+async function sendRequest(event) {
 
     event.preventDefault();
 
-
-    const lat =
-        document.getElementById(
-            "latitude"
-        ).value;
-
-    const lon =
-        document.getElementById(
-            "longitude"
-        ).value;
+    const name = document.getElementById("customerName").value;
+    const phone = document.getElementById("customerPhone").value;
+    const vehicleType = document.getElementById("vehicleType").value;
+    const vehicleNumber = document.getElementById("vehicleNumber").value;
+    const problem = document.getElementById("problem").value;
+    const latitude = document.getElementById("latitude").value;
+    const longitude = document.getElementById("longitude").value;
 
 
-    if (!lat || !lon) {
+    if (!latitude || !longitude) {
 
-        alert(
-            "Please get your current location first."
-        );
+        alert("Please share your current location first 📍");
 
         return;
     }
 
 
-    const request = {
+    try {
 
-        customer:
-            document.getElementById(
-                "customerName"
-            ).value,
+        const response = await fetch(
+            "http://localhost:5000/service/request",
+            {
+                method: "POST",
 
-        mobile:
-            document.getElementById(
-                "customerMobile"
-            ).value,
+                headers: {
+                    "Content-Type": "application/json"
+                },
 
-        vehicle:
-            document.getElementById(
-                "vehicleType"
-            ).value,
+                body: JSON.stringify({
 
-        vehicleNumber:
-            document.getElementById(
-                "vehicleNumber"
-            ).value,
+                    customer_name: name,
+                    customer_phone: phone,
+                    vehicle_type: vehicleType,
+                    vehicle_number: vehicleNumber,
+                    problem: problem,
+                    latitude: latitude,
+                    longitude: longitude
 
-        problem:
-            document.getElementById(
-                "problem"
-            ).value,
-
-        latitude: lat,
-
-        longitude: lon,
-
-        status: "Searching"
-
-    };
+                })
+            }
+        );
 
 
-    localStorage.setItem(
-        "garageRequest",
-        JSON.stringify(request)
-    );
+        const data = await response.json();
 
 
-    window.location.href =
-        "tracking.html";
+        if (response.ok) {
 
-});
+            alert("Mechanic Request Sent Successfully! 🔧");
+
+            localStorage.setItem(
+                "requestId",
+                data.request_id
+            );
+
+            window.location.href = "tracking.html";
+
+        } else {
+
+            alert(data.error || "Request failed");
+
+        }
+
+
+    } catch (error) {
+
+        alert("Backend server is not running!");
+
+        console.error(error);
+
+    }
+
+}
 
 </script>
 
