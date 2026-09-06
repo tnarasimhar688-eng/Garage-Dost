@@ -104,7 +104,74 @@
     Loading requests...
 </div>
 
+function updateMechanicLocation() {
 
+    if (!mechanicId) {
+        return;
+    }
+
+    if (!navigator.geolocation) {
+        return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+        async function(position) {
+
+            const latitude =
+                position.coords.latitude;
+
+            const longitude =
+                position.coords.longitude;
+
+            try {
+
+                await fetch(
+                    "http://localhost:5000/mechanic/location",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+
+                        body: JSON.stringify({
+
+                            mechanic_id: mechanicId,
+
+                            latitude: latitude,
+
+                            longitude: longitude
+
+                        })
+                    }
+                );
+
+                console.log(
+                    "Mechanic location updated:",
+                    latitude,
+                    longitude
+                );
+
+            } catch (error) {
+
+                console.error(
+                    "Location update failed:",
+                    error
+                );
+
+            }
+        },
+
+        function(error) {
+
+            console.log(
+                "GPS Error:",
+                error
+            );
+
+        }
+    );
+}
 <script>
 
 async function updateStatus(requestId, newStatus) {
