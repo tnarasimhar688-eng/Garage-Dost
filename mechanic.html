@@ -1,0 +1,206 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Mechanic Dashboard - Garage Dost</title>
+
+    <link rel="stylesheet"
+          href="garage-dost.css">
+
+</head>
+
+<body>
+
+<header>
+
+    <div class="logo">
+        🚗 Garage Dost
+    </div>
+
+    <a href="index.html"
+       class="btn">
+        Home
+    </a>
+
+</header>
+
+
+<main class="dashboard">
+
+    <h1 class="dashboard-title">
+        👨‍🔧 Mechanic Dashboard
+    </h1>
+
+
+    <div class="online-box">
+
+        <h2 id="onlineStatus">
+            🔴 You are OFFLINE
+        </h2>
+
+        <br>
+
+        <button
+            class="online-button"
+            onclick="goOnline()">
+
+            🟢 GO ONLINE
+
+        </button>
+
+    </div>
+
+
+    <div id="requestArea">
+
+        <div class="request-card">
+
+            <h3>
+                🚨 New Service Requests
+            </h3>
+
+            <p>
+                Go online to receive customer requests.
+            </p>
+
+        </div>
+
+    </div>
+
+</main>
+
+
+<script>
+
+function goOnline() {
+
+    document.getElementById(
+        "onlineStatus"
+    ).innerText =
+        "🟢 You are ONLINE";
+
+
+    const request =
+        JSON.parse(
+            localStorage.getItem(
+                "garageRequest"
+            )
+        );
+
+
+    if (!request) {
+
+        document.getElementById(
+            "requestArea"
+        ).innerHTML = `
+
+            <div class="request-card">
+
+                <h3>🟢 Waiting for Requests</h3>
+
+                <p>
+                    No customer request available yet.
+                </p>
+
+            </div>
+
+        `;
+
+        return;
+    }
+
+
+    document.getElementById(
+        "requestArea"
+    ).innerHTML = `
+
+        <div class="request-card">
+
+            <h3>🚨 NEW CUSTOMER REQUEST</h3>
+
+            <p>
+                <strong>Customer:</strong>
+                ${request.customer}
+            </p>
+
+            <p>
+                <strong>Vehicle:</strong>
+                ${request.vehicle}
+            </p>
+
+            <p>
+                <strong>Vehicle Number:</strong>
+                ${request.vehicleNumber}
+            </p>
+
+            <p>
+                <strong>Problem:</strong>
+                ${request.problem}
+            </p>
+
+            <p>
+                <strong>Customer Location:</strong>
+                📍 ${request.latitude},
+                ${request.longitude}
+            </p>
+
+            <br>
+
+            <button
+                class="accept-button"
+                onclick="acceptRequest()">
+
+                ✅ ACCEPT REQUEST
+
+            </button>
+
+        </div>
+
+    `;
+
+}
+
+
+function acceptRequest() {
+
+    let request =
+        JSON.parse(
+            localStorage.getItem(
+                "garageRequest"
+            )
+        );
+
+
+    request.status =
+        "Mechanic Accepted";
+
+
+    localStorage.setItem(
+        "garageRequest",
+        JSON.stringify(request)
+    );
+
+
+    alert(
+        "✅ Request Accepted!\n" +
+        "Navigate to customer location."
+    );
+
+
+    window.location.href =
+        "tracking.html";
+
+}
+
+</script>
+
+</body>
+</html>
+```
