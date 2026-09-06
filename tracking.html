@@ -1,65 +1,95 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Garage Dost - Tracking</title>
-    <link rel="stylesheet" href="garage-dost.css">
+
+    <title>Garage Dost - Live Tracking</title>
+
+    <link
+        rel="stylesheet"
+        href="garage-dost.css"
+    >
+
+    <!-- Leaflet CSS -->
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    >
+
+    <style>
+
+        #map {
+            width: 100%;
+            height: 450px;
+            margin-top: 20px;
+            border-radius: 15px;
+        }
+
+        .tracking-container {
+            max-width: 900px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        .status-box,
+        .mechanic-box {
+            padding: 20px;
+            margin-top: 15px;
+            border-radius: 12px;
+            background: #f5f5f5;
+        }
+
+    </style>
+
 </head>
 
 <body>
 
-    <header>
-        <h2>🚗 Garage Dost</h2>
-    </header>
+<header>
 
-    <main class="tracking-container">
+    <h2>🚗 Garage Dost</h2>
 
-        <h1>Mechanic Tracking</h1>
+</header>
 
-        <div class="status-box">
 
-            <h2 id="statusText">
-                🔍 Searching for mechanic...
-            </h2>
+<main class="tracking-container">
 
-            <p id="statusMessage">
-                Please wait while we find a nearby mechanic.
-            </p>
+    <h1>📍 Mechanic Tracking</h1>
 
-        </div>
 
-        <div class="map-box">
+    <div class="status-box">
 
-            <h2>📍 Location</h2>
+        <h2 id="statusText">
+            🔍 Searching for mechanic...
+        </h2>
 
-            <p id="location">
-                Loading location...
-            </p>
+        <p id="statusMessage">
+            Please wait...
+        </p>
 
-            <a
-                id="mapLink"
-                href="#"
-                target="_blank"
-            >
-                🗺️ Open Location in Google Maps
-            </a>
+    </div>
 
-        </div>
 
-        <div class="mechanic-box">
+    <div id="map"></div>
 
-            <h2>🔧 Mechanic Details</h2>
 
-            <p id="mechanicDetails">
-                Waiting for mechanic...
-            </p>
+    <div class="mechanic-box">
 
-        </div>
+        <h2>🔧 Mechanic</h2>
 
-        <button onclick="checkStatus()">
-            🔄 Refresh Status
-        </button>
+        <p id="mechanicDetails">
+            Waiting for mechanic...
+        </p>
 
-    </main>
+    </div>
+
+</main>
+
+
+<!-- Leaflet JS -->
+
+<script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+</script>
 
 
 <script>
@@ -68,13 +98,52 @@ const requestId =
     localStorage.getItem("requestId");
 
 
-async function checkStatus() {
+let map;
+
+let customerMarker;
+
+let mechanicMarker;
+
+
+// Initialize Map
+
+function initializeMap(lat, lon) {
+
+    map = L.map("map").setView(
+        [lat, lon],
+        15
+    );
+
+
+    L.tileLayer(
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        {
+            attribution:
+                "© OpenStreetMap contributors"
+        }
+    ).addTo(map);
+
+
+    customerMarker =
+        L.marker([lat, lon])
+        .addTo(map)
+        .bindPopup(
+            "📍 Customer Location"
+        )
+        .openPopup();
+
+}
+
+
+// Load Request
+
+async function loadTracking() {
 
     if (!requestId) {
 
-        alert("No service request found!");
-
-        window.location.href = "request.html";
+        alert(
+            "No service request found!"
+        );
 
         return;
     }
@@ -86,18 +155,22 @@ async function checkStatus() {
             "http://localhost:5000/service/requests"
         );
 
-        const requests = await response.json();
+
+        const requests =
+            await response.json();
 
 
-        const request = requests.find(
-            r => r.id == requestId
-        );
+        const request =
+            requests.find(
+                r => r.id == requestId
+            );
 
 
         if (!request) {
 
-            document.getElementById("statusText").innerText =
-                "❌ Request Not Found";
+            console.log(
+                "Request not found"
+            );
 
             return;
         }
@@ -105,131 +178,213 @@ async function checkStatus() {
 
         updateTracking(request);
 
-    } catch (error) {
+    }
+
+    catch (error) {
 
         console.error(error);
-
-        document.getElementById("statusText").innerText =
-            "⚠️ Backend Connection Error";
 
     }
 
 }
 
 
+// Update Tracking
+
 function updateTracking(request) {
 
-    const status =
-        request.status;
+    const customerLat =
+        parseFloat(request.latitude);
+
+    const customerLon =
+        parseFloat(request.longitude);
 
 
-    const statusText =
-        document.getElementById("statusText");
+    // Initialize map only once
 
-    const statusMessage =
-        document.getElementById("statusMessage");
+    if (!map) {
 
-
-    if (status === "Searching") {
-
-        statusText.innerText =
-            "🔍 Searching for mechanic...";
-
-        statusMessage.innerText =
-            "Finding a nearby mechanic for you.";
+        initializeMap(
+            customerLat,
+            customerLon
+        );
 
     }
 
 
-    else if (status === "Mechanic Accepted") {
+    // Status
 
-        statusText.innerText =
-            "✅ Mechanic Accepted";
-
-        statusMessage.innerText =
-            "Your mechanic has accepted the request.";
-
-    }
-
-
-    else if (status === "On the Way") {
-
-        statusText.innerText =
-            "🚗 Mechanic is On the Way";
-
-        statusMessage.innerText =
-            "Your mechanic is travelling to your location.";
-
-    }
+    document.getElementById(
+        "statusText"
+    ).innerText =
+        getStatusText(
+            request.status
+        );
 
 
-    else if (status === "Arrived") {
-
-        statusText.innerText =
-            "📍 Mechanic Arrived";
-
-        statusMessage.innerText =
-            "Mechanic has reached your location.";
-
-    }
-
-
-    else if (status === "Repairing") {
-
-        statusText.innerText =
-            "🔧 Repair in Progress";
-
-        statusMessage.innerText =
-            "Your vehicle is being repaired.";
-
-    }
-
-
-    else if (status === "Completed") {
-
-        statusText.innerText =
-            "🎉 Service Completed";
-
-        statusMessage.innerText =
-            "Your vehicle service has been completed.";
-
-    }
-
-
-    // Customer Location
-
-    document.getElementById("location").innerText =
-        "Latitude: " + request.latitude +
-        " | Longitude: " + request.longitude;
-
-
-    document.getElementById("mapLink").href =
-        "https://www.google.com/maps?q=" +
-        request.latitude + "," +
-        request.longitude;
+    document.getElementById(
+        "statusMessage"
+    ).innerText =
+        getStatusMessage(
+            request.status
+        );
 
 
     // Mechanic
 
-    if (request.mechanic_id) {
+    if (
+        request.mechanic_latitude &&
+        request.mechanic_longitude
+    ) {
 
-        document.getElementById("mechanicDetails").innerText =
-            "🔧 Mechanic ID: " +
-            request.mechanic_id;
+        const mechanicLat =
+            parseFloat(
+                request.mechanic_latitude
+            );
+
+        const mechanicLon =
+            parseFloat(
+                request.mechanic_longitude
+            );
+
+
+        if (!mechanicMarker) {
+
+            mechanicMarker =
+                L.marker(
+                    [
+                        mechanicLat,
+                        mechanicLon
+                    ]
+                )
+                .addTo(map)
+                .bindPopup(
+                    "🔧 Mechanic"
+                );
+
+        }
+
+        else {
+
+            mechanicMarker.setLatLng(
+                [
+                    mechanicLat,
+                    mechanicLon
+                ]
+            );
+
+        }
+
+
+        // Show both locations
+
+        const bounds =
+            L.latLngBounds([
+                [
+                    customerLat,
+                    customerLon
+                ],
+
+                [
+                    mechanicLat,
+                    mechanicLon
+                ]
+            ]);
+
+        map.fitBounds(bounds);
+
+    }
+
+
+    document.getElementById(
+        "mechanicDetails"
+    ).innerText =
+
+        request.mechanic_id
+        ?
+        "🔧 Mechanic ID: " +
+        request.mechanic_id
+        :
+        "🔍 Finding mechanic...";
+
+}
+
+
+// Status Text
+
+function getStatusText(status) {
+
+    switch(status) {
+
+        case "Searching":
+            return "🔍 Searching for mechanic...";
+
+        case "Mechanic Accepted":
+            return "✅ Mechanic Accepted";
+
+        case "On the Way":
+            return "🚗 Mechanic is On the Way";
+
+        case "Arrived":
+            return "📍 Mechanic Arrived";
+
+        case "Repairing":
+            return "🔧 Repair in Progress";
+
+        case "Completed":
+            return "🎉 Service Completed";
+
+        default:
+            return "🔍 Searching...";
 
     }
 
 }
 
 
-// Automatically check every 5 seconds
+// Status Message
 
-setInterval(checkStatus, 5000);
+function getStatusMessage(status) {
+
+    switch(status) {
+
+        case "Searching":
+            return "Finding a nearby mechanic.";
+
+        case "Mechanic Accepted":
+            return "Your mechanic accepted the request.";
+
+        case "On the Way":
+            return "Your mechanic is travelling to you.";
+
+        case "Arrived":
+            return "Your mechanic has arrived.";
+
+        case "Repairing":
+            return "Vehicle repair is in progress.";
+
+        case "Completed":
+            return "Service completed successfully.";
+
+        default:
+            return "Please wait...";
+
+    }
+
+}
 
 
-// First check
+// Refresh every 5 seconds
 
-checkStatus();
+setInterval(
+    loadTracking,
+    5000
+);
+
+
+// First load
+
+loadTracking();
 
 </script>
 
