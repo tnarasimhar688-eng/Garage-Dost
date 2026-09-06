@@ -296,36 +296,29 @@ def create_service_request():
 # GET SERVICE REQUESTS
 # -----------------------------
 
-@app.route("/service/requests", methods=["GET"])
-def get_service_requests():
+    @app.route("/service/requests", methods=["GET"])
+def get_requests():
 
-    conn = get_db()
+    conn = sqlite3.connect(DATABASE)
+    conn.row_factory = sqlite3.Row
 
-    requests = conn.execute("""
+    cursor = conn.cursor()
+
+    cursor.execute("""
         SELECT *
         FROM service_requests
-        WHERE status = 'Searching'
-    """).fetchall()
+        WHERE status != 'Completed'
+        ORDER BY id DESC
+    """)
+
+    requests = [
+        dict(row)
+        for row in cursor.fetchall()
+    ]
 
     conn.close()
 
-    result = []
-
-    for r in requests:
-
-        result.append({
-            "id": r["id"],
-            "customer_name": r["customer_name"],
-            "customer_phone": r["customer_phone"],
-            "vehicle_type": r["vehicle_type"],
-            "vehicle_number": r["vehicle_number"],
-            "problem": r["problem"],
-            "latitude": r["latitude"],
-            "longitude": r["longitude"],
-            "status": r["status"]
-        })
-
-    return jsonify(result)
+    return jsonify(requests)
 
 
 # -----------------------------
