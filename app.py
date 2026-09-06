@@ -740,7 +740,50 @@ def make_payment():
         "message": "Payment successful",
         "status": "Paid"
     })
+@app.route("/rating", methods=["POST"])
+def submit_rating():
 
+    data = request.json
+
+    request_id = data.get("request_id")
+    stars = data.get("stars")
+    feedback = data.get("feedback", "")
+
+    if not request_id or not stars:
+        return jsonify({
+            "error": "Rating required"
+        }), 400
+
+    conn = get_db()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT mechanic_id
+        FROM service_requests
+        WHERE id = ?
+    """, (request_id,))
+
+    result = cursor.fetchone()
+
+    mechanic_id = result["mechanic_id"] if result else None
+
+    cursor.execute("""
+        INSERT INTO ratings
+        (request_id, mechanic_id, stars, feedback)
+        VALUES (?, ?, ?, ?)
+    """, (
+        request_id,
+        mechanic_id,
+        stars,
+        feedback
+    ))
+
+    conn.commit()
+    conn.close()
+
+    return jsonify({
+        "message": "Rating submitted successfully"
+    })
 # =========================
 # START SERVER
 # =========================
