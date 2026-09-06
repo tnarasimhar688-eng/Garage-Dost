@@ -1,0 +1,92 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Payment - Garage Dost</title>
+
+    <link rel="stylesheet"
+          href="garage-dost.css">
+
+</head>
+
+<body>
+
+<header>
+
+    <div class="logo">
+        🚗 Garage Dost
+    </div>
+
+</header>
+
+
+<main class="form-page">
+
+    <div class="form-card">
+
+        <h1>💳 Payment</h1>
+
+        <p class="subtitle">
+            Service completed successfully.
+        </p>
+
+
+        <h2 style="text-align:center;">
+            Service Amount: ₹350
+        </h2>
+
+
+        <br>
+
+
+        <label>Payment Method</label>
+
+        <select id="paymentMethod">
+
+            <option>UPI</option>
+
+            <option>Cash</option>
+
+            <option>Debit / Credit Card</option>
+
+        </select>
+
+
+        <button
+            class="form-button"
+            onclick="makePayment()">
+
+            💳 Pay ₹350
+
+        </button>
+
+    </div>
+
+</main>
+
+
+<script>
+
+function makePayment() {
+
+    alert(
+        "✅ Payment Successful!"
+    );
+
+    window.location.href =
+        "rating.html";
+
+}
+
+</script>
+
+</body>
+</html>
+```
