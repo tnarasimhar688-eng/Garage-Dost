@@ -1,187 +1,237 @@
-```html
 <!DOCTYPE html>
-<html lang="en">
-
+<html>
 <head>
-
-    <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title>Track Mechanic - Garage Dost</title>
-
-    <link rel="stylesheet"
-          href="garage-dost.css">
-
+    <title>Garage Dost - Tracking</title>
+    <link rel="stylesheet" href="garage-dost.css">
 </head>
 
 <body>
 
-<header>
+    <header>
+        <h2>🚗 Garage Dost</h2>
+    </header>
 
-    <div class="logo">
-        🚗 Garage Dost
-    </div>
+    <main class="tracking-container">
 
-</header>
+        <h1>Mechanic Tracking</h1>
 
+        <div class="status-box">
 
-<main>
+            <h2 id="statusText">
+                🔍 Searching for mechanic...
+            </h2>
 
-    <div class="tracking-box">
-
-        <h1>
-            👨‍🔧 Mechanic Tracking
-        </h1>
-
-
-        <div class="map-placeholder">
-
-            📍 Customer Location
-
-            <br>
-
-            🚗
-
-            <br>
-
-            👨‍🔧 Mechanic
+            <p id="statusMessage">
+                Please wait while we find a nearby mechanic.
+            </p>
 
         </div>
 
+        <div class="map-box">
 
-        <h2 id="status">
-            🔍 Searching for mechanic...
-        </h2>
+            <h2>📍 Location</h2>
 
+            <p id="location">
+                Loading location...
+            </p>
 
-        <p id="details">
-            Please wait...
-        </p>
+            <a
+                id="mapLink"
+                href="#"
+                target="_blank"
+            >
+                🗺️ Open Location in Google Maps
+            </a>
 
+        </div>
 
-        <br>
+        <div class="mechanic-box">
 
+            <h2>🔧 Mechanic Details</h2>
 
-        <button
-            class="secondary-button"
-            onclick="simulateAccept()">
+            <p id="mechanicDetails">
+                Waiting for mechanic...
+            </p>
 
+        </div>
+
+        <button onclick="checkStatus()">
             🔄 Refresh Status
-
         </button>
 
-
-        <button
-            class="form-button"
-            onclick="completeRepair()">
-
-            🔧 Repair Completed
-
-        </button>
-
-    </div>
-
-</main>
+    </main>
 
 
 <script>
 
-function loadStatus() {
-
-    const request =
-        JSON.parse(
-            localStorage.getItem(
-                "garageRequest"
-            )
-        );
+const requestId =
+    localStorage.getItem("requestId");
 
 
-    if (!request) {
+async function checkStatus() {
 
-        document.getElementById(
-            "status"
-        ).innerText =
-            "No active request.";
+    if (!requestId) {
+
+        alert("No service request found!");
+
+        window.location.href = "request.html";
 
         return;
     }
 
 
-    document.getElementById(
-        "details"
-    ).innerText =
-        "Vehicle: " +
-        request.vehicle +
-        " | Problem: " +
-        request.problem;
+    try {
+
+        const response = await fetch(
+            "http://localhost:5000/service/requests"
+        );
+
+        const requests = await response.json();
 
 
-    if (request.status === "Searching") {
-
-        document.getElementById(
-            "status"
-        ).innerText =
-            "🔍 Finding nearby mechanic...";
-
-    }
-
-    else if (
-        request.status ===
-        "Mechanic Accepted"
-    ) {
-
-        document.getElementById(
-            "status"
-        ).innerText =
-            "🚗 Mechanic is coming to your location!";
-
-    }
-
-}
-
-
-function simulateAccept() {
-
-    let request =
-        JSON.parse(
-            localStorage.getItem(
-                "garageRequest"
-            )
+        const request = requests.find(
+            r => r.id == requestId
         );
 
 
-    if (!request) return;
+        if (!request) {
+
+            document.getElementById("statusText").innerText =
+                "❌ Request Not Found";
+
+            return;
+        }
 
 
-    request.status =
-        "Mechanic Accepted";
+        updateTracking(request);
 
+    } catch (error) {
 
-    localStorage.setItem(
-        "garageRequest",
-        JSON.stringify(request)
-    );
+        console.error(error);
 
+        document.getElementById("statusText").innerText =
+            "⚠️ Backend Connection Error";
 
-    loadStatus();
-
-}
-
-
-function completeRepair() {
-
-    window.location.href =
-        "payment.html";
+    }
 
 }
 
 
-loadStatus();
+function updateTracking(request) {
+
+    const status =
+        request.status;
+
+
+    const statusText =
+        document.getElementById("statusText");
+
+    const statusMessage =
+        document.getElementById("statusMessage");
+
+
+    if (status === "Searching") {
+
+        statusText.innerText =
+            "🔍 Searching for mechanic...";
+
+        statusMessage.innerText =
+            "Finding a nearby mechanic for you.";
+
+    }
+
+
+    else if (status === "Mechanic Accepted") {
+
+        statusText.innerText =
+            "✅ Mechanic Accepted";
+
+        statusMessage.innerText =
+            "Your mechanic has accepted the request.";
+
+    }
+
+
+    else if (status === "On the Way") {
+
+        statusText.innerText =
+            "🚗 Mechanic is On the Way";
+
+        statusMessage.innerText =
+            "Your mechanic is travelling to your location.";
+
+    }
+
+
+    else if (status === "Arrived") {
+
+        statusText.innerText =
+            "📍 Mechanic Arrived";
+
+        statusMessage.innerText =
+            "Mechanic has reached your location.";
+
+    }
+
+
+    else if (status === "Repairing") {
+
+        statusText.innerText =
+            "🔧 Repair in Progress";
+
+        statusMessage.innerText =
+            "Your vehicle is being repaired.";
+
+    }
+
+
+    else if (status === "Completed") {
+
+        statusText.innerText =
+            "🎉 Service Completed";
+
+        statusMessage.innerText =
+            "Your vehicle service has been completed.";
+
+    }
+
+
+    // Customer Location
+
+    document.getElementById("location").innerText =
+        "Latitude: " + request.latitude +
+        " | Longitude: " + request.longitude;
+
+
+    document.getElementById("mapLink").href =
+        "https://www.google.com/maps?q=" +
+        request.latitude + "," +
+        request.longitude;
+
+
+    // Mechanic
+
+    if (request.mechanic_id) {
+
+        document.getElementById("mechanicDetails").innerText =
+            "🔧 Mechanic ID: " +
+            request.mechanic_id;
+
+    }
+
+}
+
+
+// Automatically check every 5 seconds
+
+setInterval(checkStatus, 5000);
+
+
+// First check
+
+checkStatus();
 
 </script>
 
 </body>
 </html>
-```
