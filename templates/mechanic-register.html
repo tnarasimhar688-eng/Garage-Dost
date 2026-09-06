@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Garage Dost - Mechanic Register</title>
+
+    <link
+        rel="stylesheet"
+        href="/static/garage-dost.css"
+    >
+
+</head>
+
+<body>
+
+<header>
+    <h2>🚗 Garage Dost</h2>
+</header>
+
+<main class="form-container">
+
+    <h1>🔧 Mechanic Registration</h1>
+
+    <form onsubmit="registerMechanic(event)">
+
+        <input
+            type="text"
+            id="name"
+            placeholder="Mechanic Name"
+            required
+        >
+
+        <input
+            type="tel"
+            id="phone"
+            placeholder="Mobile Number"
+            required
+        >
+
+        <input
+            type="password"
+            id="password"
+            placeholder="Create Password"
+            required
+        >
+
+        <button type="submit">
+            REGISTER
+        </button>
+
+    </form>
+
+    <p>
+        Already registered?
+        <a href="/mechanic-login">
+            Login
+        </a>
+    </p>
+
+</main>
+
+<script>
+
+async function registerMechanic(event) {
+
+    event.preventDefault();
+
+    const name =
+        document.getElementById("name").value;
+
+    const phone =
+        document.getElementById("phone").value;
+
+    const password =
+        document.getElementById("password").value;
+
+
+    try {
+
+        const response = await fetch(
+            "/mechanic/register",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+
+                    name: name,
+                    phone: phone,
+                    password: password
+
+                })
+            }
+        );
+
+
+        const data =
+            await response.json();
+
+
+        if (response.ok) {
+
+            alert(
+                "Mechanic registered successfully! 🔧"
+            );
+
+            window.location.href =
+                "/mechanic-login";
+
+        } else {
+
+            alert(
+                data.error ||
+                "Registration failed"
+            );
+
+        }
+
+    } catch (error) {
+
+        alert(
+            "Server connection failed!"
+        );
+
+        console.error(error);
+
+    }
+
+}
+
+</script>
+
+</body>
+</html>
