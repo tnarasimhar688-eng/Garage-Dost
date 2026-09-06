@@ -35,31 +35,26 @@
         </p>
 
 
-        <form onsubmit="customerLogin(event)">
+       <form onsubmit="loginCustomer(event)">
 
-            <label>Mobile Number</label>
+    <input
+        type="tel"
+        id="phone"
+        placeholder="Enter Mobile Number"
+        required
+    >
 
-            <input
-                type="tel"
-                id="customerPhone"
-                placeholder="Enter mobile number"
-                maxlength="10"
-                required
-            >
+    <input
+        type="password"
+        id="password"
+        placeholder="Enter Password"
+        required
+    >
 
+    <button type="submit">
+        LOGIN
+    </button>
 
-            <label>Password</label>
-
-            <input
-                type="password"
-                placeholder="Enter password"
-                required
-            >
-
-
-            <button class="form-button">
-                Login
-            </button>
 
         </form>
 
@@ -76,8 +71,6 @@
 
 </main>
 
-
-<script>
 
 <script>
 async function loginCustomer(event) {
