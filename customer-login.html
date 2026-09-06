@@ -1,0 +1,98 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Customer Login - Garage Dost</title>
+
+    <link rel="stylesheet" href="garage-dost.css">
+</head>
+
+<body>
+
+<header>
+
+    <div class="logo">🚗 Garage Dost</div>
+
+    <a href="index.html" class="btn">
+        Home
+    </a>
+
+</header>
+
+
+<main class="form-page">
+
+    <div class="form-card">
+
+        <h1>👤 Customer Login</h1>
+
+        <p class="subtitle">
+            Login to request a nearby mechanic.
+        </p>
+
+
+        <form onsubmit="customerLogin(event)">
+
+            <label>Mobile Number</label>
+
+            <input
+                type="tel"
+                id="customerPhone"
+                placeholder="Enter mobile number"
+                maxlength="10"
+                required
+            >
+
+
+            <label>Password</label>
+
+            <input
+                type="password"
+                placeholder="Enter password"
+                required
+            >
+
+
+            <button class="form-button">
+                Login
+            </button>
+
+        </form>
+
+
+        <button
+            class="secondary-button"
+            onclick="location.href='customer-register.html'">
+
+            Create New Account
+
+        </button>
+
+    </div>
+
+</main>
+
+
+<script>
+
+function customerLogin(event) {
+
+    event.preventDefault();
+
+    localStorage.setItem(
+        "customerLoggedIn",
+        "true"
+    );
+
+    window.location.href = "request.html";
+}
+
+</script>
+
+</body>
+</html>
+```
