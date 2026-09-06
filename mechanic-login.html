@@ -43,50 +43,84 @@
         </p>
 
 
-        <form onsubmit="mechanicLogin(event)">
+        <form onsubmit="loginMechanic(event)">
 
-            <label>Mobile Number</label>
+    <input
+        type="tel"
+        id="phone"
+        placeholder="Mechanic Mobile Number"
+        required
+    >
 
-            <input
-                type="tel"
-                placeholder="Mechanic mobile number"
-                required
-            >
+    <input
+        type="password"
+        id="password"
+        placeholder="Password"
+        required
+    >
 
+    <button type="submit">
+        🔧 MECHANIC LOGIN
+    </button>
 
-            <label>Password</label>
-
-            <input
-                type="password"
-                placeholder="Password"
-                required
-            >
-
-
-            <button class="form-button">
-                Mechanic Login
-            </button>
-
-        </form>
-
-    </div>
-
-</main>
-
+</form>
 
 <script>
 
-function mechanicLogin(event) {
+async function loginMechanic(event) {
 
     event.preventDefault();
 
-    localStorage.setItem(
-        "mechanicLoggedIn",
-        "true"
-    );
+    const phone = document.getElementById("phone").value;
+    const password = document.getElementById("password").value;
 
-    window.location.href =
-        "mechanic.html";
+    try {
+
+        const response = await fetch(
+            "http://localhost:5000/mechanic/login",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    phone: phone,
+                    password: password
+                })
+            }
+        );
+
+        const data = await response.json();
+
+        if (response.ok) {
+
+            alert("Mechanic Login Successful 🔧");
+
+            localStorage.setItem(
+                "mechanicId",
+                data.mechanic.id
+            );
+
+            localStorage.setItem(
+                "mechanicName",
+                data.mechanic.name
+            );
+
+            window.location.href = "mechanic.html";
+
+        } else {
+
+            alert(data.error || "Invalid login details");
+
+        }
+
+    } catch (error) {
+
+        alert("Backend server is not running!");
+
+        console.error(error);
+
+    }
 }
 
 </script>
