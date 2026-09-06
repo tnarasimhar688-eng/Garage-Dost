@@ -1,0 +1,137 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Rate Mechanic - Garage Dost</title>
+
+    <link rel="stylesheet"
+          href="garage-dost.css">
+
+</head>
+
+<body>
+
+<header>
+
+    <div class="logo">
+        🚗 Garage Dost
+    </div>
+
+</header>
+
+
+<main class="form-page">
+
+    <div class="form-card">
+
+        <h1 style="text-align:center;">
+            ⭐ Rate Your Mechanic
+        </h1>
+
+        <p class="subtitle">
+            How was your Garage Dost experience?
+        </p>
+
+
+        <div class="stars">
+
+            <span class="star"
+                  onclick="rate(1)">☆</span>
+
+            <span class="star"
+                  onclick="rate(2)">☆</span>
+
+            <span class="star"
+                  onclick="rate(3)">☆</span>
+
+            <span class="star"
+                  onclick="rate(4)">☆</span>
+
+            <span class="star"
+                  onclick="rate(5)">☆</span>
+
+        </div>
+
+
+        <textarea
+            placeholder="Write your feedback...">
+        </textarea>
+
+
+        <button
+            class="form-button"
+            onclick="submitRating()">
+
+            ⭐ Submit Rating
+
+        </button>
+
+    </div>
+
+</main>
+
+
+<script>
+
+let selectedRating = 0;
+
+
+function rate(number) {
+
+    selectedRating = number;
+
+
+    const stars =
+        document.querySelectorAll(
+            ".star"
+        );
+
+
+    stars.forEach(
+        function(star, index) {
+
+            star.innerText =
+                index < number
+                ? "★"
+                : "☆";
+
+        }
+    );
+
+}
+
+
+function submitRating() {
+
+    if (selectedRating === 0) {
+
+        alert(
+            "Please select a rating."
+        );
+
+        return;
+    }
+
+
+    alert(
+        "⭐ Thank you for rating Garage Dost!"
+    );
+
+
+    window.location.href =
+        "index.html";
+
+}
+
+</script>
+
+</body>
+</html>
+```
