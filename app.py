@@ -706,7 +706,40 @@ def nearest_mechanic():
             round(shortest_distance, 2)
 
     })
+@app.route("/payment", methods=["POST"])
+def make_payment():
 
+    data = request.json
+
+    request_id = data.get("request_id")
+    amount = data.get("amount")
+    method = data.get("method")
+
+    if not request_id or not amount or not method:
+        return jsonify({
+            "error": "Payment details required"
+        }), 400
+
+    conn = get_db()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        INSERT INTO payments
+        (request_id, amount, method, status)
+        VALUES (?, ?, ?, 'Paid')
+    """, (
+        request_id,
+        amount,
+        method
+    ))
+
+    conn.commit()
+    conn.close()
+
+    return jsonify({
+        "message": "Payment successful",
+        "status": "Paid"
+    })
 
 # =========================
 # START SERVER
