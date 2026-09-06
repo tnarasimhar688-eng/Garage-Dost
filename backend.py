@@ -1,11 +1,11 @@
-from flask import Flask, math, request, jsonify
+from flask import Flask, math, request, API,jsonify
 from flask_cors import CORS
 import sqlite3
 
 app = Flask(__name__)
 CORS(app)
 
-DATABASE = "garage_dost.db"
+DATABASE = "garage_dost.db" 
 
 
 # -----------------------------
@@ -405,6 +405,40 @@ def calculate_distance(lat1, lon1, lat2, lon2):
     )
 
     return R * c
+
+@app.route("/mechanic/location", methods=["POST"])
+def update_mechanic_location():
+
+    data = request.json
+
+    mechanic_id = data.get("mechanic_id")
+    latitude = data.get("latitude")
+    longitude = data.get("longitude")
+
+    if not mechanic_id or latitude is None or longitude is None:
+        return jsonify({
+            "error": "Mechanic ID and location required"
+        }), 400
+
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        UPDATE mechanics
+        SET latitude = ?, longitude = ?, online = 1
+        WHERE id = ?
+    """, (
+        latitude,
+        longitude,
+        mechanic_id
+    ))
+
+    conn.commit()
+    conn.close()
+
+    return jsonify({
+        "message": "Mechanic location updated"
+    })
 
 # -----------------------------
 # RUN SERVER
