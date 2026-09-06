@@ -1,0 +1,87 @@
+div.innerHTML = `
+
+    <h3>🚗 ${request.vehicle_type}</h3>
+
+    <p>
+        <b>Customer:</b>
+        ${request.customer_name}
+    </p>
+
+    <p>
+        <b>Phone:</b>
+        ${request.customer_phone}
+    </p>
+
+    <p>
+        <b>Vehicle:</b>
+        ${request.vehicle_number}
+    </p>
+
+    <p>
+        <b>Problem:</b>
+        ${request.problem}
+    </p>
+
+    <p>
+        📍 Location:
+        ${request.latitude},
+        ${request.longitude}
+    </p>
+
+    <p>
+        <b>Status:</b>
+        ${request.status}
+    </p>
+
+    ${
+        request.status === "Searching"
+        ?
+        `<button onclick="acceptRequest(${request.id})">
+            ✅ ACCEPT REQUEST
+        </button>`
+        :
+        ""
+    }
+
+    ${
+        request.status === "Mechanic Accepted"
+        ?
+        `<button onclick="updateStatus(${request.id}, 'On the Way')">
+            🚗 ON THE WAY
+        </button>`
+        :
+        ""
+    }
+
+    ${
+        request.status === "On the Way"
+        ?
+        `<button onclick="updateStatus(${request.id}, 'Arrived')">
+            📍 ARRIVED
+        </button>`
+        :
+        ""
+    }
+
+    ${
+        request.status === "Arrived"
+        ?
+        `<button onclick="updateStatus(${request.id}, 'Repairing')">
+            🔧 START REPAIR
+        </button>`
+        :
+        ""
+    }
+
+    ${
+        request.status === "Repairing"
+        ?
+        `<button onclick="updateStatus(${request.id}, 'Completed')">
+            ✅ COMPLETE SERVICE
+        </button>`
+        :
+        ""
+    }
+
+    <hr>
+`;
