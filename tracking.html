@@ -1,0 +1,187 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Track Mechanic - Garage Dost</title>
+
+    <link rel="stylesheet"
+          href="garage-dost.css">
+
+</head>
+
+<body>
+
+<header>
+
+    <div class="logo">
+        🚗 Garage Dost
+    </div>
+
+</header>
+
+
+<main>
+
+    <div class="tracking-box">
+
+        <h1>
+            👨‍🔧 Mechanic Tracking
+        </h1>
+
+
+        <div class="map-placeholder">
+
+            📍 Customer Location
+
+            <br>
+
+            🚗
+
+            <br>
+
+            👨‍🔧 Mechanic
+
+        </div>
+
+
+        <h2 id="status">
+            🔍 Searching for mechanic...
+        </h2>
+
+
+        <p id="details">
+            Please wait...
+        </p>
+
+
+        <br>
+
+
+        <button
+            class="secondary-button"
+            onclick="simulateAccept()">
+
+            🔄 Refresh Status
+
+        </button>
+
+
+        <button
+            class="form-button"
+            onclick="completeRepair()">
+
+            🔧 Repair Completed
+
+        </button>
+
+    </div>
+
+</main>
+
+
+<script>
+
+function loadStatus() {
+
+    const request =
+        JSON.parse(
+            localStorage.getItem(
+                "garageRequest"
+            )
+        );
+
+
+    if (!request) {
+
+        document.getElementById(
+            "status"
+        ).innerText =
+            "No active request.";
+
+        return;
+    }
+
+
+    document.getElementById(
+        "details"
+    ).innerText =
+        "Vehicle: " +
+        request.vehicle +
+        " | Problem: " +
+        request.problem;
+
+
+    if (request.status === "Searching") {
+
+        document.getElementById(
+            "status"
+        ).innerText =
+            "🔍 Finding nearby mechanic...";
+
+    }
+
+    else if (
+        request.status ===
+        "Mechanic Accepted"
+    ) {
+
+        document.getElementById(
+            "status"
+        ).innerText =
+            "🚗 Mechanic is coming to your location!";
+
+    }
+
+}
+
+
+function simulateAccept() {
+
+    let request =
+        JSON.parse(
+            localStorage.getItem(
+                "garageRequest"
+            )
+        );
+
+
+    if (!request) return;
+
+
+    request.status =
+        "Mechanic Accepted";
+
+
+    localStorage.setItem(
+        "garageRequest",
+        JSON.stringify(request)
+    );
+
+
+    loadStatus();
+
+}
+
+
+function completeRepair() {
+
+    window.location.href =
+        "payment.html";
+
+}
+
+
+loadStatus();
+
+</script>
+
+</body>
+</html>
+```
