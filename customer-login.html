@@ -79,18 +79,44 @@
 
 <script>
 
-function customerLogin(event) {
-
+<script>
+async function loginCustomer(event) {
     event.preventDefault();
 
-    localStorage.setItem(
-        "customerLoggedIn",
-        "true"
-    );
+    const phone = document.getElementById("phone").value;
+    const password = document.getElementById("password").value;
 
-    window.location.href = "request.html";
+    try {
+        const response = await fetch("http://localhost:5000/customer/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                phone: phone,
+                password: password
+            })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            alert("Login Successful! 🚗");
+
+            localStorage.setItem("customerLoggedIn", "true");
+            localStorage.setItem("customerName", data.customer.name);
+            localStorage.setItem("customerPhone", data.customer.phone);
+
+            window.location.href = "request.html";
+        } else {
+            alert(data.error || "Invalid login details");
+        }
+
+    } catch (error) {
+        alert("Backend server is not running!");
+        console.error(error);
+    }
 }
-
 </script>
 
 </body>
