@@ -4,6 +4,92 @@
 
 <button onclick="goOnline()">
     🟢 GO ONLINE
+    async function goOnline() {
+
+    if (!mechanicId) {
+        alert("Please login first!");
+        return;
+    }
+
+    if (!navigator.geolocation) {
+        alert("GPS not supported!");
+        return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+        async function(position) {
+
+            const latitude =
+                position.coords.latitude;
+
+            const longitude =
+                position.coords.longitude;
+
+            try {
+
+                const response = await fetch(
+                    "http://localhost:5000/mechanic/online",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+
+                        body: JSON.stringify({
+
+                            mechanic_id: mechanicId,
+
+                            latitude: latitude,
+
+                            longitude: longitude,
+
+                            online: true
+
+                        })
+                    }
+                );
+
+                const data = await response.json();
+
+                if (response.ok) {
+
+                    document.getElementById(
+                        "onlineStatus"
+                    ).innerText =
+                        "🟢 You are ONLINE";
+
+                    alert(
+                        "You are ONLINE 📍"
+                    );
+
+                    loadRequests();
+
+                } else {
+
+                    alert(data.error);
+
+                }
+
+            } catch (error) {
+
+                alert(
+                    "Backend server error!"
+                );
+
+            }
+
+        },
+
+        function() {
+
+            alert(
+                "Please allow GPS location permission."
+            );
+
+        }
+    );
+}
 </button>
 
 <p id="onlineStatus">
