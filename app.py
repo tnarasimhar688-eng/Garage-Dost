@@ -1,3 +1,4 @@
+from flask import Flask, request, jsonify, render_template
 @app.route("/service/nearest-mechanic", methods=["POST"])
 def nearest_mechanic():
 
@@ -58,3 +59,46 @@ def nearest_mechanic():
         "mechanic": nearest,
         "distance_km": round(shortest_distance, 2)
     })
+@app.route("/")
+def home():
+    return render_template("index.html")
+
+
+@app.route("/customer-login")
+def customer_login():
+    return render_template("customer-login.html")
+
+
+@app.route("/customer-register")
+def customer_register():
+    return render_template("customer-register.html")
+
+
+@app.route("/request")
+def service_request():
+    return render_template("request.html")
+
+
+@app.route("/mechanic-login")
+def mechanic_login():
+    return render_template("mechanic-login.html")
+
+
+@app.route("/mechanic")
+def mechanic_page():
+    return render_template("mechanic.html")
+
+
+@app.route("/tracking")
+def tracking():
+    return render_template("tracking.html")
+
+
+@app.route("/payment")
+def payment():
+    return render_template("payment.html")
+
+
+@app.route("/rating")
+def rating():
+    return render_template("rating.html")
