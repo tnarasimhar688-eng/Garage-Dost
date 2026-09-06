@@ -108,22 +108,53 @@ function rate(number) {
 }
 
 
-function submitRating() {
+async function submitRating() {
 
-    if (selectedRating === 0) {
+    const requestId = localStorage.getItem("requestId");
 
-        alert(
-            "Please select a rating."
-        );
+    const stars = document.querySelector(
+        'input[name="rating"]:checked'
+    ).value;
 
-        return;
+    const feedback = document.getElementById(
+        "feedback"
+    ).value;
+
+    const response = await fetch("/rating", {
+
+        method: "POST",
+
+        headers: {
+            "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+            request_id: requestId,
+            stars: stars,
+            feedback: feedback
+        })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+
+        alert("Thank you for your rating ⭐");
+
+        localStorage.removeItem("requestId");
+
+        window.location.href = "/";
+
+    } else {
+
+        alert(data.error);
+
     }
-
+}
 
     alert(
         "⭐ Thank you for rating Garage Dost!"
     );
-
 
     window.location.href =
         "index.html";
