@@ -76,13 +76,39 @@
 
 function makePayment() {
 
-    alert(
-        "✅ Payment Successful!"
-    );
+   async function makePayment() {
 
-    window.location.href =
-        "rating.html";
+    const requestId = localStorage.getItem("requestId");
 
+    const method = document.querySelector(
+        'input[name="payment"]:checked'
+    ).value;
+
+    const response = await fetch("/payment", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            request_id: requestId,
+            amount: 350,
+            method: method
+        })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+
+        alert("Payment Successful ✅");
+
+        window.location.href = "/rating";
+
+    } else {
+
+        alert(data.error);
+
+    }
 }
 
 </script>
