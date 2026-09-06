@@ -1,203 +1,224 @@
-```html
-<!DOCTYPE html>
-<html lang="en">
+<h1>🔧 Garage Dost Mechanic</h1>
 
-<head>
+<h2 id="mechanicName">Mechanic</h2>
 
-    <meta charset="UTF-8">
+<button onclick="goOnline()">
+    🟢 GO ONLINE
+</button>
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+<p id="onlineStatus">
+    You are OFFLINE
+</p>
 
-    <title>Mechanic Dashboard - Garage Dost</title>
+<hr>
 
-    <link rel="stylesheet"
-          href="garage-dost.css">
+<h2>📋 Available Service Requests</h2>
 
-</head>
-
-<body>
-
-<header>
-
-    <div class="logo">
-        🚗 Garage Dost
-    </div>
-
-    <a href="index.html"
-       class="btn">
-        Home
-    </a>
-
-</header>
-
-
-<main class="dashboard">
-
-    <h1 class="dashboard-title">
-        👨‍🔧 Mechanic Dashboard
-    </h1>
-
-
-    <div class="online-box">
-
-        <h2 id="onlineStatus">
-            🔴 You are OFFLINE
-        </h2>
-
-        <br>
-
-        <button
-            class="online-button"
-            onclick="goOnline()">
-
-            🟢 GO ONLINE
-
-        </button>
-
-    </div>
-
-
-    <div id="requestArea">
-
-        <div class="request-card">
-
-            <h3>
-                🚨 New Service Requests
-            </h3>
-
-            <p>
-                Go online to receive customer requests.
-            </p>
-
-        </div>
-
-    </div>
-
-</main>
+<div id="requests">
+    Loading requests...
+</div>
 
 
 <script>
 
-function goOnline() {
-
-    document.getElementById(
-        "onlineStatus"
-    ).innerText =
-        "🟢 You are ONLINE";
+const mechanicId = localStorage.getItem("mechanicId");
 
 
-    const request =
-        JSON.parse(
-            localStorage.getItem(
-                "garageRequest"
-            )
-        );
+async function goOnline() {
 
+    if (!mechanicId) {
 
-    if (!request) {
+        alert("Please login first!");
 
-        document.getElementById(
-            "requestArea"
-        ).innerHTML = `
-
-            <div class="request-card">
-
-                <h3>🟢 Waiting for Requests</h3>
-
-                <p>
-                    No customer request available yet.
-                </p>
-
-            </div>
-
-        `;
+        window.location.href = "mechanic-login.html";
 
         return;
     }
 
 
-    document.getElementById(
-        "requestArea"
-    ).innerHTML = `
+    try {
 
-        <div class="request-card">
+        const response = await fetch(
+            "http://localhost:5000/mechanic/online",
+            {
+                method: "POST",
 
-            <h3>🚨 NEW CUSTOMER REQUEST</h3>
+                headers: {
+                    "Content-Type": "application/json"
+                },
 
-            <p>
-                <strong>Customer:</strong>
-                ${request.customer}
-            </p>
-
-            <p>
-                <strong>Vehicle:</strong>
-                ${request.vehicle}
-            </p>
-
-            <p>
-                <strong>Vehicle Number:</strong>
-                ${request.vehicleNumber}
-            </p>
-
-            <p>
-                <strong>Problem:</strong>
-                ${request.problem}
-            </p>
-
-            <p>
-                <strong>Customer Location:</strong>
-                📍 ${request.latitude},
-                ${request.longitude}
-            </p>
-
-            <br>
-
-            <button
-                class="accept-button"
-                onclick="acceptRequest()">
-
-                ✅ ACCEPT REQUEST
-
-            </button>
-
-        </div>
-
-    `;
-
-}
-
-
-function acceptRequest() {
-
-    let request =
-        JSON.parse(
-            localStorage.getItem(
-                "garageRequest"
-            )
+                body: JSON.stringify({
+                    mechanic_id: mechanicId,
+                    latitude: 0,
+                    longitude: 0,
+                    online: true
+                })
+            }
         );
 
 
-    request.status =
-        "Mechanic Accepted";
+        const data = await response.json();
+
+        if (response.ok) {
+
+            document.getElementById("onlineStatus").innerText =
+                "🟢 You are ONLINE";
+
+            alert("You are now ONLINE!");
+
+            loadRequests();
+
+        } else {
+
+            alert(data.error);
+
+        }
+
+    } catch (error) {
+
+        alert("Backend server is not running!");
+
+    }
+}
 
 
-    localStorage.setItem(
-        "garageRequest",
-        JSON.stringify(request)
-    );
+async function loadRequests() {
+
+    try {
+
+        const response = await fetch(
+            "http://localhost:5000/service/requests"
+        );
+
+        const data = await response.json();
+
+        const container =
+            document.getElementById("requests");
+
+        container.innerHTML = "";
 
 
-    alert(
-        "✅ Request Accepted!\n" +
-        "Navigate to customer location."
-    );
+        if (data.length === 0) {
+
+            container.innerHTML =
+                "<p>No service requests available.</p>";
+
+            return;
+        }
 
 
-    window.location.href =
-        "tracking.html";
+        data.forEach(request => {
+
+            const div = document.createElement("div");
+
+            div.className = "request-card";
+
+            div.innerHTML = `
+
+                <h3>🚗 ${request.vehicle_type}</h3>
+
+                <p>
+                    <b>Customer:</b>
+                    ${request.customer_name}
+                </p>
+
+                <p>
+                    <b>Phone:</b>
+                    ${request.customer_phone}
+                </p>
+
+                <p>
+                    <b>Vehicle:</b>
+                    ${request.vehicle_number}
+                </p>
+
+                <p>
+                    <b>Problem:</b>
+                    ${request.problem}
+                </p>
+
+                <p>
+                    📍 Location:
+                    ${request.latitude},
+                    ${request.longitude}
+                </p>
+
+                <button onclick="acceptRequest(${request.id})">
+                    ✅ ACCEPT REQUEST
+                </button>
+
+                <hr>
+            `;
+
+            container.appendChild(div);
+
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+    }
 
 }
+
+
+async function acceptRequest(requestId) {
+
+    try {
+
+        const response = await fetch(
+            "http://localhost:5000/service/accept",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+
+                    request_id: requestId,
+
+                    mechanic_id: mechanicId
+
+                })
+            }
+        );
+
+
+        const data = await response.json();
+
+
+        if (response.ok) {
+
+            alert("Request Accepted! 🚗🔧");
+
+            localStorage.setItem(
+                "requestId",
+                requestId
+            );
+
+            window.location.href =
+                "tracking.html";
+
+        } else {
+
+            alert(data.error);
+
+        }
+
+    } catch (error) {
+
+        alert("Backend server error!");
+
+    }
+
+}
+
+
+document.getElementById("mechanicName").innerText =
+    "🔧 " + (localStorage.getItem("mechanicName") || "Mechanic");
 
 </script>
 
