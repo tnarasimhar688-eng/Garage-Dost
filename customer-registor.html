@@ -43,50 +43,35 @@
         </p>
 
 
-        <form onsubmit="registerCustomer(event)">
+       <form onsubmit="registerCustomer(event)">
 
-            <label>Full Name</label>
+    <input
+        type="text"
+        id="name"
+        placeholder="Enter Name"
+        required
+    >
 
-            <input
-                type="text"
-                placeholder="Enter your name"
-                required
-            >
+    <input
+        type="tel"
+        id="phone"
+        placeholder="Enter Mobile Number"
+        required
+    >
 
+    <input
+        type="password"
+        id="password"
+        placeholder="Enter Password"
+        required
+    >
 
-            <label>Mobile Number</label>
+    <button type="submit">
+        REGISTER
+    </button>
 
-            <input
-                type="tel"
-                placeholder="Enter mobile number"
-                maxlength="10"
-                required
-            >
+</form>
 
-
-            <label>Password</label>
-
-            <input
-                type="password"
-                placeholder="Create password"
-                required
-            >
-
-
-            <label>Confirm Password</label>
-
-            <input
-                type="password"
-                placeholder="Confirm password"
-                required
-            >
-
-
-            <button class="form-button">
-                Register
-            </button>
-
-        </form>
 
     </div>
 
