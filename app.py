@@ -66,7 +66,25 @@ def init_db():
 
     conn.commit()
     conn.close()
+cursor.execute("""
+    CREATE TABLE IF NOT EXISTS payments (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        request_id INTEGER,
+        amount REAL,
+        method TEXT,
+        status TEXT DEFAULT 'Paid'
+    )
+""")
 
+cursor.execute("""
+    CREATE TABLE IF NOT EXISTS ratings (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        request_id INTEGER,
+        mechanic_id INTEGER,
+        stars INTEGER,
+        feedback TEXT
+    )
+""")
 
 # =========================
 # HOME / HTML PAGES
